@@ -11,7 +11,9 @@ int is_digit(char c);
 int is_operator(char c);
 
 void main() {	
-	
+	//교훈
+	//1. getchar()로 받은 char형 변수 값 확인시 '' 작은 따옴표 사용하기. \n 확인도 작은따옴표 사용해야 체크가 됨
+
 	real_calculator();
 }
 
@@ -27,51 +29,52 @@ void real_calculator(void) {
 		c = getchar();
 		/// char 형 c 가 엔터라는걸 체크하질 않음
 		/// c=="\n' -> c=='\n'		"대신 '를 사용해야함
-		if(c=='\n'){
+		/*if (c == '\n') {
 			printf("getchar-enter status-%d stage-%d operator-%c result-%f  ", status, stage, operator, result);
 			printf("num1 : %f, num2 : %f\n", num1, num2);		
 		}
 		else {
 			printf("getchar-%c status-%d stage-%d operator-%c result-%f  ", c, status, stage, operator, result);
 			printf("num1 : %f, num2 : %f\n", num1, num2);
-		}
+		}*/
 
 		if (stage == STAGE1) {
 			
 			if (is_digit(c)) {
 				num1 = get_real(num1, c, status);
+				if (status != 0) status++;
 			}
 			else if (c == '.') {
 				status = status + 1;
 			}
 			else if (is_operator(c)) {
 				operator = c;
-				status = 0;
+				num2 = 0; status = 0;
 				stage  = STAGE2;
 			}
 		}
 		else if (stage == STAGE2) {
 			if (is_digit(c)) {
 				num2 = get_real(num2, c, status);
+				if (status != 0) status++;
 			}
 			else if (c == '.') {
 				status++;
 			}
 			else if (c == '\n') {
 				result = gaesan(num1, operator, num2);
-				printf("= %.2f", result);
+				printf("= %f", result);
 				stage = STAGE3;
 			}
 		}
 		else if (stage == STAGE3) {
 			if (is_operator(c)) {
-				num1 = result;
-				operator = c;
+				status = 0; num1 = result; num2 = 0; operator = c;
 				stage = STAGE2;
 			}
 			else if(c == '\n') {
-				status = 0;
-				num1 = 0; num2 = 0;
+				//초기화
+				status = 0;	num1 = 0; num2 = 0; operator = '0';
 				stage = STAGE1;
 			}
 		}
@@ -81,15 +84,23 @@ void real_calculator(void) {
 }
 
 double gaesan(double num1, char operator, double num2) {
-	double result;
-	if (operator == "+") {
+	double result = 0.0;
+
+	// ''쓰세요
+	if (operator == '+') {
 		result = num1 + num2;
-	}else if (operator == "-") {
+	}else if (operator == '-') {
 		result = num1 - num2;
-	}else if(operator == "*") {
+	}else if(operator == '*') {
 		result = num1 * num2;
-	}else if(operator == "/") {
-		result = num1 / num2;
+	}else if(operator == '/') {
+		if (num2 == 0) {
+			printf("0으로 나누기 불가능!\n");
+			return num1;
+		}
+		else {
+			result = num1 / num2;
+		}
 	}
 	return result;
 }
@@ -137,19 +148,19 @@ double get_real(double current_operand, char c, int status) {
 	
 	if (status == 0) {
 		new_value = c - '0';
-		printf("new value %f\n", new_value);
+		//printf("new value %f\n", new_value);
 		
 		current_operand *= 10;
 		current_operand += new_value;
-		printf("current operand %f\n\n", current_operand);
+		//printf("current operand %f\n\n", current_operand);
 	}
 	else {
 		new_value = c - '0';
-		printf("new value %f\n", new_value);
+		//printf("new value %f\n", new_value);
 		for (int i = 0; i < status; i++)
 			new_value /= 10;
 		current_operand += new_value;
-		printf("current operand %f\n\n", current_operand);
+		//printf("current operand %f\n\n", current_operand);
 	}
 	return current_operand;
 }
